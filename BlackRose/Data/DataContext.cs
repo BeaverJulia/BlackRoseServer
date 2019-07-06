@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BlackRose.Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlackRose.Data
@@ -10,5 +11,6 @@ namespace BlackRose.Data
         {
             
         }
+        public DbSet <Picture> pictureContext { get; set; }
     }
 }

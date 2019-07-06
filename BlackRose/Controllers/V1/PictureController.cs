@@ -1,51 +1,98 @@
 ﻿using System;
-using BlackRose.Contracts.V1;
-using BlackRose.Contracts.V1.Request;
-using BlackRose.Contracts.V1.Responses;
-using BlackRose.Domain;
-using BlackRose.Services;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
-namespace BlackRose.Controllers.V1
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using BlackRose.Domain;
+using System.IdentityModel.Tokens.Jwt;
+using BlackRose.Contracts.V1;
+using BlackRose.Services;
+using BlackRose.Data;
+using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
+using BlackRose.Data
+namespace ImageUploadDemo.Controllers
 {
-    public class PictureController : Controller
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    
+    public class PictureController : ControllerBase
     {
-        private readonly IPictureService _pictureService;
-
-        public PictureController(IPictureService pictureService)
+        public string PathImage;
+        public static IHostingEnvironment _environment;
+        public UserManager<IdentityUser> _userManager;
+        private IPictureService _pictureService;
+        public PictureController(IHostingEnvironment environment, UserManager<IdentityUser> userManager, IPictureService pictureService)
         {
+            _environment = environment;
+            _userManager = userManager;
             _pictureService = pictureService;
         }
-
-        [HttpGet(ApiRoutes.Pictures.GetAll)]
-        public IActionResult GetAll()
+        public class FIleUploadAPI
         {
-            return Ok(_pictureService.GetPictures());
+            public string Description { get; set; }
+            public string Tags{ get; set; }
+            public IFormFile files { get; set; }
         }
 
-        [HttpGet(ApiRoutes.Pictures.Get)]
-        public IActionResult Get([FromRoute] Guid pictureId)
-        {
-            var picture = _pictureService.GetPictureById(pictureId);
-            if (picture == null)
-                return NotFound();
-            return Ok(picture);
-        }
 
+        public async Task AddPicture(FIleUploadAPI pic)
+        {
+
+            string userId = User.Claims.First(c => c.Type == "id").Value;
+            var user = await _userManager.FindByIdAsync(userId);
+            string CurrentuserName = user.UserName;
+            Guid.TryParse(user.Id, out Guid CurrentId);
+            
+            var model = new Picture
+            {
+                UserName = CurrentuserName,
+                Id = CurrentId,
+                ImagePath = PathImage,
+                Description = pic.Description,
+                Tags = pic.Tags
+
+            };
+
+            DataContext
+        }
         [HttpPost(ApiRoutes.Pictures.Create)]
-        public IActionResult Create([FromBody] CreatePictureRequest pictureRequest)
+        public async Task<string> Post([FromForm]FIleUploadAPI files)
         {
-            var picture = new Picture {Id = pictureRequest.Id};
 
-            if (picture.Id != Guid.Empty)
-                picture.Id = Guid.NewGuid();
-            _pictureService.GetPictures().Add(picture);
+            if (files.files.Length > 0)
+            {
+                try
+                {
+                    if (!Directory.Exists(_environment.WebRootPath + "\\uploads\\"))
+                    {
+                        Directory.CreateDirectory(_environment.WebRootPath + "\\uploads\\");
+                    }
+                    using (FileStream filestream = System.IO.File.Create(_environment.WebRootPath + "\\uploads\\" + files.files.FileName))
+                    {
+                        files.files.CopyTo(filestream);
+                        filestream.Flush();
+                        PathImage = "\\uploads\\" + files.files.FileName;
+                        await AddPicture(files);
+                        return (PathImage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return ex.ToString();
+                }
+            }
+            else
+            {
+                return "Unsuccessful";
+            }
 
-            var baseurl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
-            var locationUrl = baseurl + "/" + ApiRoutes.Pictures.Get.Replace("{pictureId}", picture.Id.ToString());
-
-            var response = new PictureResponse {Id = picture.Id};
-            return Created(locationUrl, response);
         }
+
+
     }
 }

@@ -12,5 +12,11 @@
             public const string Create = Base + "/picture";
             public const string Get = Base + "/picture/{pictureId}";
         }
+        public static class Identity
+        {
+            public const string Login = Base + "/identity/login";
+            public const string Register = Base + "/identity/register";
+
+        }
     }
 }
