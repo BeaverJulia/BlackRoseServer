@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BlackRose.Data
 {
-    public class DbContext : IdentityDbContext
+    public class DataContext : IdentityDbContext
     {
-        public DbContext(DbContextOptions<DbContext> options)
+        public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
+            
         }
     }
 }
