@@ -15,7 +15,9 @@ using BlackRose.Services;
 using BlackRose.Data;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
-using BlackRose.Data
+using BlackRose.Data;
+using System.Collections.Generic;
+
 namespace ImageUploadDemo.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -40,55 +42,70 @@ namespace ImageUploadDemo.Controllers
         }
 
 
-        public async Task AddPicture(FIleUploadAPI pic)
+        public async Task<Picture> AddPicture(FIleUploadAPI pic)
         {
 
             string userId = User.Claims.First(c => c.Type == "id").Value;
             var user = await _userManager.FindByIdAsync(userId);
             string CurrentuserName = user.UserName;
-            Guid.TryParse(user.Id, out Guid CurrentId);
-            
+            Guid newId = Guid.NewGuid();
+
+
             var model = new Picture
             {
                 UserName = CurrentuserName,
-                Id = CurrentId,
+                Id = newId,
                 ImagePath = PathImage,
                 Description = pic.Description,
                 Tags = pic.Tags
 
             };
+            await _pictureService.CreatePictureAsync(model);
+            return model;
 
-            DataContext
+        }
+        [HttpGet(ApiRoutes.Pictures.GetAll)]
+        public async Task<List<Picture>> GetAll()
+        {
+            return await _pictureService.GetPicturesAsync();
+        }
+        [HttpPost(ApiRoutes.Pictures.Delete)]
+        public async Task<bool> DeleteGuid ([FromForm]Guid pictureId)
+        {
+            return await _pictureService.DeletePictureAsync(pictureId);
         }
         [HttpPost(ApiRoutes.Pictures.Create)]
-        public async Task<string> Post([FromForm]FIleUploadAPI files)
+        public async Task<JsonResult> Post([FromForm]FIleUploadAPI files)
         {
 
             if (files.files.Length > 0)
             {
                 try
                 {
-                    if (!Directory.Exists(_environment.WebRootPath + "\\uploads\\"))
+                    string uploadsPath = _environment.WebRootPath + "/uploads/";
+                    if (!Directory.Exists(uploadsPath))
                     {
-                        Directory.CreateDirectory(_environment.WebRootPath + "\\uploads\\");
+                        Directory.CreateDirectory(uploadsPath);
                     }
-                    using (FileStream filestream = System.IO.File.Create(_environment.WebRootPath + "\\uploads\\" + files.files.FileName))
+                    using (FileStream filestream = System.IO.File.Create(uploadsPath + files.files.FileName))
                     {
                         files.files.CopyTo(filestream);
                         filestream.Flush();
-                        PathImage = "\\uploads\\" + files.files.FileName;
-                        await AddPicture(files);
-                        return (PathImage);
+                        var pic=await AddPicture(files);
+                        string filePath = "/uploads/" + files.files.FileName;
+                        pic.ImagePath = filePath;
+                        return new JsonResult(pic);
+
                     }
                 }
                 catch (Exception ex)
                 {
-                    return ex.ToString();
+                    return new JsonResult(ex);
                 }
             }
             else
             {
-                return "Unsuccessful";
+                return new JsonResult("Unsuccesful");
             }
 
         }

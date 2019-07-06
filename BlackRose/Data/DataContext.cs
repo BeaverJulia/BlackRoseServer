@@ -12,5 +12,6 @@ namespace BlackRose.Data
             
         }
         public DbSet <Picture> pictureContext { get; set; }
+        
     }
 }

@@ -8,8 +8,9 @@
 
         public static class Pictures
         {
-            public const string GetAll = Base + "/picture";
+            public const string GetAll = Base + "/picture/GetAll";
             public const string Create = Base + "/picture";
+            public const string Delete = Base + "/picture/delete";
             public const string Get = Base + "/picture/{pictureId}";
         }
         public static class Identity

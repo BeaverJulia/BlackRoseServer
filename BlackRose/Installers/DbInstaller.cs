@@ -17,7 +17,8 @@ namespace BlackRose.Installers
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<DataContext>();
 
-            services.AddSingleton<IPictureService, PictureService>();
+            services.AddScoped<IPictureService, PictureService>();
+
         }
     }
 }
