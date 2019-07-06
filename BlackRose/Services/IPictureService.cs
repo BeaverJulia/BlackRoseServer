@@ -9,8 +9,8 @@ namespace BlackRose.Services
     {
         Task<List<Picture>> GetPicturesAsync();
 
+        Task<List<Picture>> GetPictureByTagAsync(string tag);
         Task<Picture> GetPictureByIdAsync(Guid pictureId);
-
         Task<bool> DeletePictureAsync(Guid pictureId);
         Task<bool> CreatePictureAsync(Picture picture);
     }

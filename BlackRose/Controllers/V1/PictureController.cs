@@ -24,7 +24,6 @@ namespace ImageUploadDemo.Controllers
     
     public class PictureController : ControllerBase
     {
-        public string PathImage;
         public static IHostingEnvironment _environment;
         public UserManager<IdentityUser> _userManager;
         private IPictureService _pictureService;
@@ -42,7 +41,7 @@ namespace ImageUploadDemo.Controllers
         }
 
 
-        public async Task<Picture> AddPicture(FIleUploadAPI pic)
+        public async Task<Picture> AddPicture(FIleUploadAPI pic, string filePath)
         {
 
             string userId = User.Claims.First(c => c.Type == "id").Value;
@@ -55,7 +54,7 @@ namespace ImageUploadDemo.Controllers
             {
                 UserName = CurrentuserName,
                 Id = newId,
-                ImagePath = PathImage,
+                ImagePath = filePath,
                 Description = pic.Description,
                 Tags = pic.Tags
 
@@ -65,10 +64,15 @@ namespace ImageUploadDemo.Controllers
 
         }
         [HttpGet(ApiRoutes.Pictures.GetAll)]
-        public async Task<List<Picture>> GetAll()
+        public async Task<List<Picture>> GetAll([FromQuery] string tag)
         {
+            if (tag != null)
+            {
+                return await _pictureService.GetPictureByTagAsync(tag);
+            }
             return await _pictureService.GetPicturesAsync();
         }
+        
         [HttpPost(ApiRoutes.Pictures.Delete)]
         public async Task<bool> DeleteGuid ([FromForm]Guid pictureId)
         {
@@ -91,9 +95,8 @@ namespace ImageUploadDemo.Controllers
                     {
                         files.files.CopyTo(filestream);
                         filestream.Flush();
-                        var pic=await AddPicture(files);
                         string filePath = "/uploads/" + files.files.FileName;
-                        pic.ImagePath = filePath;
+                        var pic=await AddPicture(files, filePath);
                         return new JsonResult(pic);
 
                     }

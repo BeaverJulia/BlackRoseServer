@@ -9,5 +9,6 @@ namespace WebAPI.Controllers
     public interface IIdentityService
     {
         Task<AuthenticationResult> RegisterAsync(string Email, string Password, string UserName);
+        Task<AuthenticationResult> LoginAsync(string email, string password);
     }
 }

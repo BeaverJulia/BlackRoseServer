@@ -30,6 +30,15 @@ namespace BlackRose.Services
             return await _dataContext.pictureContext.SingleOrDefaultAsync(x => x.Id == pictureId);
               
         }
+        public async Task<List<Picture>> GetPictureByTagAsync(string tag)
+        {
+            string tagLike = "%" + tag + "%";
+            var query = from s in _dataContext.pictureContext
+                        where EF.Functions.Like(s.Tags, tagLike)
+                        select s;
+            return await (query.ToListAsync());
+
+        }
 
         public async Task <bool> CreatePictureAsync (Picture picture)
         {

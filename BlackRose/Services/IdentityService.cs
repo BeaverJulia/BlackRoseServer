@@ -50,6 +50,38 @@ namespace WebAPI.Controllers
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
+
+            var token = GenerateToken(newUser);
+            return new AuthenticationResult
+            {
+                Success = true,
+                Token = tokenHandler.WriteToken(token)
+            };
+        }
+
+        public async Task<AuthenticationResult> LoginAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null && await _userManager.CheckPasswordAsync(user, password))
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var token = GenerateToken(user);
+                return new AuthenticationResult
+                {
+                    Success = true,
+                    Token = tokenHandler.WriteToken(token)
+                };
+            }
+            else
+            return new AuthenticationResult
+            {
+                Errors = new[] { "Username or password is incorrect." }
+            };
+        }
+
+        public SecurityToken GenerateToken(IdentityUser newUser)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
             var tokenDescriptior = new SecurityTokenDescriptor
             {
@@ -61,15 +93,10 @@ namespace WebAPI.Controllers
                     new Claim("id", newUser.Id)
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
-                SigningCredentials= new SigningCredentials(new SymmetricSecurityKey(key),SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
 
             };
-            var token = tokenHandler.CreateToken(tokenDescriptior);
-            return new AuthenticationResult
-            {
-                Success = true,
-                Token = tokenHandler.WriteToken(token)
-            };
+            return tokenHandler.CreateToken(tokenDescriptior);
         }
     }
 }

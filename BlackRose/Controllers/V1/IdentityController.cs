@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost (ApiRoutes.Identity.Register)]
-        public async Task<IActionResult> RegisterAsync([FromForm]UserRegistrationRequest request)
+        public async Task<IActionResult> RegisterAsync([FromBody]UserRegistrationRequest request)
         {
             var authResponse = await _identityService.RegisterAsync(request.Email, request.Password, request.UserName);
             if (!authResponse.Success)
@@ -41,42 +41,23 @@ namespace WebAPI.Controllers
             {
                 Token = authResponse.Token
             });
-            //var newUser = new ApplicationUser
-            //{
-            //    UserName = User.UserName,
-            //    Email = User.Email
-            //};
-            //var createuser = await _userManager.CreateAsync(newUser, User.Password);
+        }
 
-            //if (!createuser.Succeeded)
-            //{
-            //    return new AuthenticationResultcs
-            //    {
-            //        ErrorMessage = createuser.Errors.Select(x => x.Description)
-            //    };
-            //}
-
-            //var tokenHandler = new JwtSecurityTokenHandler();
-            //var key = Encoding.ASCII.GetBytes("s6c5mMwqNk56LhCIJNjXCMfn8Vpk847M");
-            //var tokenDescriptior = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(new[]
-            //    {
-            //        new Claim(JwtRegisteredClaimNames.Sub, newUser.Email),
-            //        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            //        new Claim(JwtRegisteredClaimNames.Email, newUser.Email),
-            //        new Claim("id", newUser.Id)
-            //    }),
-            //    Expires = DateTime.UtcNow.AddHours(2),
-            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-
-            //};
-            //var token = tokenHandler.CreateToken(tokenDescriptior);
-            //return new AuthenticationResultcs
-            //{
-            //    Success = true,
-            //    Token = tokenHandler.WriteToken(token)
-            //};
+        [HttpPost(ApiRoutes.Identity.Login)]
+        public async Task<IActionResult> LoginAsync([FromBody]LoginRequest request)
+        {
+            var authResponse = await _identityService.LoginAsync(request.Email, request.Password);
+            if (!authResponse.Success)
+            {
+                return BadRequest(new AuthFailedResponse
+                {
+                    Errors = authResponse.Errors
+                });
+            }
+            return Ok(new AuthSuccessResponse
+            {
+                Token = authResponse.Token
+            });
         }
 
     }
