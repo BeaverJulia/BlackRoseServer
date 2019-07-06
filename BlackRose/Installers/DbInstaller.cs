@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using DbContext = BlackRose.Data.DbContext;
 
 namespace BlackRose.Installers
 {
@@ -16,12 +13,11 @@ namespace BlackRose.Installers
         {
             services.AddDbContext<DbContext>(options =>
                 options.UseSqlServer(
-                   configuration.GetConnectionString("DefaultConnection")));
+                    configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<DbContext>();
+                .AddEntityFrameworkStores<Microsoft.EntityFrameworkCore.DbContext>();
 
             services.AddSingleton<IPictureService, PictureService>();
         }
-
     }
 }
