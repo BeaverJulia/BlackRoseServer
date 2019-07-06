@@ -1,15 +1,17 @@
-﻿using BlackRose.Domain;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using BlackRose.Domain;
 
 namespace BlackRose.Services
 {
-   public interface IPictureService
+    public interface IPictureService
     {
-        List<Picture> GetPictures();
+        Task<List<Picture>> GetPicturesAsync();
 
-        Picture GetPictureById(Guid pictureId);
+        Task<Picture> GetPictureByIdAsync(Guid pictureId);
+
+        Task<bool> DeletePictureAsync(Guid pictureId);
+        Task<bool> CreatePictureAsync(Picture picture);
     }
 }
