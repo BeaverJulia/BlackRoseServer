@@ -48,7 +48,7 @@ namespace ImageUploadDemo.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             string CurrentuserName = user.UserName;
             Guid newId = Guid.NewGuid();
-
+            var TimeNow = DateTime.UtcNow;
 
             var model = new Picture
             {
@@ -56,7 +56,8 @@ namespace ImageUploadDemo.Controllers
                 Id = newId,
                 ImagePath = filePath,
                 Description = pic.Description,
-                Tags = pic.Tags
+                Tags = pic.Tags,
+                Time=TimeNow
 
             };
             await _pictureService.CreatePictureAsync(model);

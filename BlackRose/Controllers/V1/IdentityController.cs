@@ -56,7 +56,8 @@ namespace WebAPI.Controllers
             }
             return Ok(new AuthSuccessResponse
             {
-                Token = authResponse.Token
+                Token = authResponse.Token,
+                UserName = authResponse.UserName
             });
         }
 

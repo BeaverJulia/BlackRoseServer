@@ -46,7 +46,8 @@ namespace BlackRose.Installers
                 {
                     builder.WithOrigins("*")
                                         .AllowAnyHeader()
-                                        .AllowAnyMethod();
+                                        .AllowAnyMethod()
+                                        .AllowCredentials();
                 });
             });
           

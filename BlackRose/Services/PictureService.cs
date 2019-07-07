@@ -22,7 +22,7 @@ namespace BlackRose.Services
 
         public async Task <List<Picture>> GetPicturesAsync()
         {
-            return await _dataContext.pictureContext.ToListAsync();
+            return await _dataContext.pictureContext.OrderByDescending(x => x.Time).ToListAsync();
         }
 
         public async Task <Picture> GetPictureByIdAsync(Guid pictureId)

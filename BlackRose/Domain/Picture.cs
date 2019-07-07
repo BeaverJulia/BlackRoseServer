@@ -10,6 +10,7 @@ namespace BlackRose.Domain
         public string ImagePath { get; set; }
 
         public string Tags { get; set; }
+        public DateTime Time { get; set; }
 
     }
 }
