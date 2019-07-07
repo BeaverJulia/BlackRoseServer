@@ -36,7 +36,7 @@ namespace BlackRose.Services
             var query = from s in _dataContext.pictureContext
                         where EF.Functions.Like(s.Tags, tagLike)
                         select s;
-            return await (query.ToListAsync());
+            return await (query.OrderByDescending(x => x.Time).ToListAsync());
 
         }
 

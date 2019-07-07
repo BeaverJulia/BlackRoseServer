@@ -75,7 +75,7 @@ namespace ImageUploadDemo.Controllers
         }
         
         [HttpPost(ApiRoutes.Pictures.Delete)]
-        public async Task<bool> DeleteGuid ([FromForm]Guid pictureId)
+        public async Task<bool> DeleteGuid ([FromBody]Guid pictureId)
         {
             return await _pictureService.DeletePictureAsync(pictureId);
         }
