@@ -38,6 +38,18 @@ namespace BlackRose.Installers
                     ValidateLifetime = true
                 };
             });
+            string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+            services.AddCors(options =>
+            {
+                options.AddPolicy(MyAllowSpecificOrigins,
+                builder =>
+                {
+                    builder.WithOrigins("*")
+                                        .AllowAnyHeader()
+                                        .AllowAnyMethod();
+                });
+            });
+          
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSwaggerGen(x => { x.SwaggerDoc("v1", new Info {Title = "BlackRose", Version = "v1"});
                 var security = new Dictionary<string, IEnumerable<string>>

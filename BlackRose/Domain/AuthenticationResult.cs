@@ -11,5 +11,7 @@ namespace BlackRose.Domain
         public bool Success { get; set; }
         public IEnumerable<string> Errors { get; set; }
 
+        public string UserName { get; set; }
+
     }
 }

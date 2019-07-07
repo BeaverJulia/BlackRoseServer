@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
-    public class IdentityService: IIdentityService
+    public class IdentityService : IIdentityService
     {
         private readonly JwtSettings _jwtSettings;
         private readonly UserManager<IdentityUser> _userManager;
@@ -26,13 +26,13 @@ namespace WebAPI.Controllers
         public async Task<AuthenticationResult> RegisterAsync(string email, string password, string userName)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
-         if(existingUser!=null)
+            if (existingUser != null)
             {
                 return new AuthenticationResult
                 {
                     Errors = new[] { "User With this email address exists" }
                 };
-           }
+            }
             var newUser = new IdentityUser()
             {
                 UserName = userName,
@@ -69,14 +69,17 @@ namespace WebAPI.Controllers
                 return new AuthenticationResult
                 {
                     Success = true,
-                    Token = tokenHandler.WriteToken(token)
+                    Token = tokenHandler.WriteToken(token),
+                    UserName = user.UserName
+
                 };
             }
             else
-            return new AuthenticationResult
-            {
-                Errors = new[] { "Username or password is incorrect." }
-            };
+                return new AuthenticationResult
+                {
+                    Errors = new[] { "Username or password is incorrect." }
+                };
+
         }
 
         public SecurityToken GenerateToken(IdentityUser newUser)

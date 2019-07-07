@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    
     [ApiController]
     public class IdentityController : ControllerBase
     {

@@ -38,7 +38,8 @@ namespace BlackRose
             {
                 option.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description);
             });
-         
+            string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseMvc();
         }
     }
